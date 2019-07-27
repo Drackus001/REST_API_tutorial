@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
                 orders: doc.map(doc => {
                     return {
                         _id: doc._id,
-                        product: doc.productID,
+                        product: doc.product,
                         quantity: doc.quantity,
                         request: {
                             type: 'GET',
@@ -40,7 +40,7 @@ router.post('/', (req, res, next) => {
             if (!product) {
                 return res.status(404).json({
                     message: 'productID not found'
-                }) 
+                })
             }
             const order = new Order({
                 _id: new mongoose.Types.ObjectId(),
@@ -54,12 +54,12 @@ router.post('/', (req, res, next) => {
             console.log(result);
             res.status(201).json({
                 message: 'Order created.',
-                orderCreated:{
+                orderCreated: {
                     _id: result._id,
-                    productID: result.product,
+                    product: result.product,
                     quantity: result.quantity,
                 },
-                
+
                 request: {
                     type: 'POST',
                     url: 'http://localhost:3000/orders/' + result._id
@@ -77,30 +77,67 @@ router.post('/', (req, res, next) => {
 // orderID
 router.get('/:orderID', (req, res, next) => {
     const id = req.params.orderID
-    if (id === 'SPECIAL') {
-        res.status(200).json({
-            message: '(SPECIAL) ID found.'
+    
+    Order.findById(id)
+        .exec()
+        .then(doc => {
+            if(!doc._id){
+                return res.status(404).json({
+                    message: 'Order not found'
+                })
+            }
+            res.status(200).json({
+                message: 'Order available',
+                order: {
+                    _id: doc._id,
+                    product: doc.product,
+                    quantity: doc.quantity
+                },
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/orders/'
+                }
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
         })
 
-    }
-    else {
-        res.status(201).json({
-            message: 'You passed an ID.'
+});
+
+router.delete('/:orderID', (req, res, next) => {
+    const id = req.params.orderID
+    
+    Order
+        .remove({ _id: id })
+        .then(doc => {
+            if(!doc._id){
+                return res.status(404).json({
+                    message:'Order not found'
+                })
+            }
+            res.status(200).json({
+                message: 'Order deleted.',
+                description: `${doc._id} order deleted.`,
+                request: {
+                    type: 'POST',
+                    url: 'http://localhost:3000/orders/',
+                    body: {
+                        productID: 'ID',
+                        quantity: 'Number'
+                    }
+                }
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            })
         })
 
-    }
-});
-
-router.patch('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'order patched'
-    })
-});
-
-router.delete('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'order deleted.'
-    })
 })
 
 
