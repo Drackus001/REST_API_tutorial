@@ -8,6 +8,8 @@ const Product = require('../models/product')
 router.get('/', (req, res, next) => {
     Order
         .find()
+        .select("product quantity _id")
+        .populate('product', 'name')
         .exec()
         .then(doc => {
             res.status(200).json({
@@ -80,6 +82,7 @@ router.get('/:orderID', (req, res, next) => {
     
     Order.findById(id)
         .exec()
+        .populate('product')
         .then(doc => {
             if(!doc._id){
                 return res.status(404).json({
@@ -114,11 +117,7 @@ router.delete('/:orderID', (req, res, next) => {
     Order
         .remove({ _id: id })
         .then(doc => {
-            if(!doc._id){
-                return res.status(404).json({
-                    message:'Order not found'
-                })
-            }
+            
             res.status(200).json({
                 message: 'Order deleted.',
                 description: `${doc._id} order deleted.`,
