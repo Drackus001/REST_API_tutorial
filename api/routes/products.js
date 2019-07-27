@@ -47,8 +47,16 @@ router.post('/', (req, res, next) => {
     .then(result => {
         console.log(result)
         res.status(201).json({
-            message: "Handling POST requests to /products",
-            products: product
+            message: "Created product Successfully",
+            products: {
+                    _id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    request:{
+                        type:'POST',
+                        url: 'http://localhost:3000/products/' + product._id
+                    }
+            }            
         });
     })
     .catch(err => {
