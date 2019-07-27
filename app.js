@@ -2,9 +2,14 @@ const express =  require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
 
 const productsRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
+
+mongoose.connect('mongodb+srv://admin:'+ process.env.MONGO_ATLAS_PWD +'@cluster0-xlx1c.mongodb.net/test?retryWrites=true&w=majority',
+{ useNewUrlParser: true });
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
