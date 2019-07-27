@@ -75,7 +75,14 @@ router.get('/:productID', (req, res, next) => {
     .then( doc =>{
         console.log("from database", doc);
         if(doc){
-            res.status(200).json(doc);
+            res.status(200).json({
+                message: 'element available',
+                request: {
+                    type:'GET',
+                    description: 'ALL_PRODUCT_LIST',
+                    url:'http://localhost:3000/products/'
+                }
+            });
         }else{
             res.status(404).json({
                 message: 'Element Not Found'
@@ -101,7 +108,16 @@ router.patch('/:productID', (req, res, next) => {
    .exec()
    .then( doc => {
        console.log(doc)
-       res.status(200).json(doc)
+       res.status(200).json({
+           message: 'Product Updated...',
+           updated:{ updateOps } ,
+           request: {
+               type:'GET',
+               description: 'see updated product',
+               url:'http://localhost:3000/product/' + id
+           }
+
+       })
    })
    .catch( err => {
        console.log(err)
@@ -115,7 +131,18 @@ router.delete('/:productID', (req, res, next) => {
     Product
     .remove({ _id:id })
     .then(doc => {
-        res.status(200).json({doc})
+        res.status(200).json({
+            message: 'Product deleted.',
+            request: {
+                type: 'POST',
+                url: 'http://localhost:3000/products'
+            },
+            body: {
+                name: "String",
+                price: "Number"
+            }
+
+        })
         console.log(doc)
     })
     .catch( err => {
